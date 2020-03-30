@@ -1,0 +1,7 @@
+<form [formGroup]="registerForm" (ngSubmit)="surveySubmit()">
+    <p>Tell us about you in 500 characters or less.</p>
+    <input name="userName" formControlName="bio" #bio maxlength="500">
+     {{bio.value.length}}
+   <button type="submit" class="btn btn-success">Submit</button>
+</form>
+<div id="photos" #photos></div>

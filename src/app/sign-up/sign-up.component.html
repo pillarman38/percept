@@ -1,0 +1,34 @@
+<div class="signUpField">
+    <div #firstNameDiv>
+        <p>Your first name</p>
+       <input type="text" id="firstName" #firstName> 
+    </div>
+
+    <div #lastNameDiv>
+        <p>Your last name</p>
+       <input type="text" id="lastName" #lastName> 
+    </div>
+
+    <div #passDiv>
+        <p>create password</p>
+        <input type="password" id="password" #password>
+    </div>
+
+    <div #passConfDiv>
+        <p>Confirm password</p>
+        <input type="password" id="passwordConfirm" #passwordConfirm>
+    </div>
+
+    <div #emailDiv>
+        <p>create email</p>
+        <input type="text" id="email" #email>
+    </div>
+
+    <div #emailConfDiv>
+        <p>Confirm email</p>
+        <input type="text" id="emailConfirm" #emailConfirm>
+    </div>
+<button type="button" (click)="login()">Back to login</button>
+<button type="submit" (click)="signUp()">signup</button>
+
+</div>

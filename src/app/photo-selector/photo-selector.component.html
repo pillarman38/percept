@@ -1,0 +1,16 @@
+<div class="dropzone" appDnd (fileDropped)='onFileDropped($event)'>
+    <input type="file" #fileDropRef id="fileDropRef" multiple (change)="fileBrowseHandler($event)" multiple>
+    <img src="../../assets/images/upload.png" alt="" width="64" height="64">
+    <p>Drag and drop files here.</p>
+    <p>or</p>
+    <p>Browse for file.</p>
+   
+</div> 
+<div id="photoAlbum" #photoAlbum>
+    <ul>
+        <li *ngFor="let dat of arr">
+            <img src="{{dat.arrBuffer}}" width="200" height="200" (click)="imageClick($event)">
+        </li>
+    </ul>
+</div>
+<a routerLink="/questionnaire">Upload photos</a>
