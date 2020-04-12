@@ -1,8 +1,7 @@
 import { Component, OnInit, HostListener, ViewChild, ElementRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { PhotoUploaderService } from '../photo-uploader.service';
-import { $ } from 'protractor';
-
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-photo-selector',
@@ -10,92 +9,82 @@ import { $ } from 'protractor';
   styleUrls: ['./photo-selector.component.css']
 })
 export class PhotoSelectorComponent implements OnInit {
-  @ViewChild('output') outputImg: ElementRef;
-  @ViewChild('photoAlbum') photoAlbum: ElementRef;
-  formData = new FormData()
+
+  @ViewChild('dropArea') dropArea: ElementRef;
+  @ViewChild('progressBar') progressBar: ElementRef;
+  @ViewChild('gallery') gallery: ElementRef;
+
+  uploadProgress = []
 
   constructor(private http: HttpClient, private photoServ: PhotoUploaderService) { }
 
-  public message: string;
-  imgURL: any;
-  z = 0
-  data;
-  eve;
-  arr = []
+  handleDrop(e) {
+    e.preventDefault()
+    e.stopPropagation()
+    console.log(e)
 
-  onFileDropped($event) {
-    console.log(this.z, $event.length)
-    this.eve = $event
-    
-    // var mimeType = $event[this.z].type;
-    // console.log($event[this.z]['name'])
-    // if (mimeType.match(/image\/*/) == null || mimeType.match(/video\/*/)) {
-    //   this.message = "Only images and videos are supported.";
-    //   console.log(this.message)
-    //   return;
-    // }
-
-      let reader = new FileReader();
-      // console.log(reader)
-      console.log($event[this.z])
-      reader.readAsDataURL($event[this.z]); 
-
-      reader.onload = (_event) => {
-          var dataURI = <any> reader.result
-          var byteString = atob(dataURI.split(',')[1]);
-          var ab = new ArrayBuffer(byteString.length);
-          var ia = new Uint8Array(ab);
-
-          for (var ii = 0; ii < byteString.length; ii++) {
-              ia[ii] = byteString.charCodeAt(ii);
-          }
-          
-          var data = {
-          blo: new Blob([ab]),
-          other: $event[this.z],
-          arrBuffer: dataURI
-        }
-          if(this.z < $event.length) {
-            console.log(this.z, $event.length)
-            this.z++;
-            this.uploadFile(data)
-            
-          }
-        }
-      }
-
-  imageClick($event) {
-    console.log($event)
-    $event.target.classList.add('profilePhoto')
-  }
-
-  uploadFile(data) {
-    // console.log(data)
-    this.arr.push(data)
-    // console.log(this.arr)
-    // console.log("hi", data, this.z)
-    var blob = data['blo']
-    var fileName = data['other']['name']
-    var formData = new FormData()
-    formData.append('photos', localStorage.getItem('email'))
-    formData.append('photos', blob, fileName)
-    console.log(formData)
-    this.http.post('http://192.168.1.86:3001/api/management/uploadPhoto', formData).subscribe((res) => {
-      console.log(res)
-    })
-    if(this.z == this.eve.length) {
-      console.log("uploading complete!")
-      this.z = 0
-    } else {
-      console.log(this.eve)
-      this.onFileDropped(this.eve)
-    }
-  }
-
-  fileBrowseHandler(files) {
-    console.log(files)
+    this.handleFiles(e.target.files)
   }
   
+  initializeProgress(numFiles) {
+    this.progressBar.nativeElement.value = 0
+    this.uploadProgress = []
+  
+    for(let i = numFiles; i > 0; i--) {
+      this.uploadProgress.push(0)
+    }
+  }
+  
+  updateProgress(fileNumber, percent) {
+    this.uploadProgress[fileNumber] = percent
+    let total = this.uploadProgress.reduce((tot, curr) => tot + curr, 0) / this.uploadProgress.length
+    console.debug('update', fileNumber, percent, total)
+    this.progressBar.nativeElement.value = total
+  }
+  
+  handleFiles(files) {
+    console.log(files)
+    files = [...files]
+    this.initializeProgress(files.length)
+    files.forEach(this.uploadFile)
+    files.forEach(this.previewFile)
+  }
+  
+  previewFile(file) {
+    let reader = new FileReader()
+    let gallery = document.getElementById('gallery')
+    reader.readAsDataURL(file)
+    reader.onloadend = function() {
+
+      let imgStr = reader.result as string
+      
+      gallery.innerHTML += `<img src=${imgStr} width='100' height='100'>`
+    }
+  }
+  
+  uploadFile(file, i) {
+    var formData = new FormData();
+  
+    formData.append("photo", "Groucho");// number 123456 is immediately converted to a string "123456"
+    // HTML file input, chosen by user
+    formData.append("photos", file);
+    formData.append("photos", localStorage.getItem('email'));
+    // JavaScript file-like object
+    var content = '<a id="a"><b id="b">hey!</b></a>'; // the body of the new file...
+    var blob = new Blob([content], { type: "text/xml"});
+  
+    
+    
+    var request = new XMLHttpRequest();
+    request.onreadystatechange = function() {
+      if (request.readyState == XMLHttpRequest.DONE) {
+          console.log(request.responseText);
+      }
+  }
+    request.open("POST", 'http://192.168.1.86:3001/api/management/uploadPhoto');
+    request.send(formData);
+
+  }
   ngOnInit(): void {
   }
 }

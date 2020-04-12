@@ -17,7 +17,6 @@ let routeFunctions = {
                 if(res[0]['email'] == userInfo['email']) {
                     return callback("email in use")
                 }
-                
             }
         })
     },

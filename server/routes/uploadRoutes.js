@@ -37,7 +37,7 @@ router.post('/signup', upload.single('signup'), function (req, res) {
                    res.send({err: err})
                } 
                if(results) {
-                   res.send({results: results})
+                   res.send({results: rssesults})
             }
          })
       });
@@ -45,7 +45,7 @@ router.post('/signup', upload.single('signup'), function (req, res) {
 })
 
 router.post('/uploadPhoto', upload.array('photos', 6), function (req, res, next) {
-   console.log(req.files[0])
+   console.log(req.files)
    models.uploadPhotos({
       path: `http://192.168.1.86:3001/${req.files[0]['filename']}`,
       email: req.body['photos']
@@ -61,7 +61,6 @@ router.post('/uploadPhoto', upload.array('photos', 6), function (req, res, next)
 
 router.post('/login', function(req, res) {
    models.login(req, (err, results) => {
-      // console.log(results)
       res.send({results: results})
    })
 })
